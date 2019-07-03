@@ -6,10 +6,10 @@
 YZX_SMS_URL = 'https://open.ucpaas.com/ol/sms/sendsms'
 
 YZX_SMS_PARAMS = {
-    'sid': '22ac8d51a958dc580d8503173199845c',
-    'token': '8f44a2423cba9bf316d6197e88bfd3ac',
-    'appid': '14595d89fddf4bbfa633f497a673a0b8',
-    'templateid': '481679',
+    'sid': '30d6bcfa572af4d93c267f6b5aef5716',
+    'token': 'abca1e88c1eb1a5e43a67cb9fdab9b61',
+    'appid': '0446dca0e4134eb2ad2bad60f237d948',
+    'templateid': '481924',
     'param': None,
     'mobile': None
 }

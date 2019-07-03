@@ -11,4 +11,4 @@ def send_verify_code(phone_num):
     # 生成验证码
     # 调用短信接口，发送验证码
     code = utils.gen_random_code(6)
-    sms.send(phone_num, code)
+    return sms.send(phone_num, code)
