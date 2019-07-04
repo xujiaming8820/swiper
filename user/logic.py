@@ -1,7 +1,7 @@
 from django.core.cache import cache
 
 from common import utils, config
-from lib import sms
+from libs import sms
 
 
 def send_verify_code(phone_num):

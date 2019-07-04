@@ -6,8 +6,8 @@ from django.shortcuts import render
 
 # Create your views here.
 from common import utils, errors, config
-from lib.http import render_json
-from lib.sms import send
+from libs.http import render_json
+from libs.sms import send
 from user import logic
 from user.forms import ProfileForm
 from user.models import User, Profile

@@ -6,7 +6,7 @@ from django.db import models
 # Create your models here.
 from django.utils.functional import cached_property
 
-from lib.orm import ModelToDictMixin
+from libs.orm import ModelToDictMixin
 
 
 class User(models.Model):

@@ -1,7 +1,7 @@
 from django.utils.deprecation import MiddlewareMixin
 
 from common import errors
-from lib.http import render_json
+from libs.http import render_json
 from user.models import User
 
 
