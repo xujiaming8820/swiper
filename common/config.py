@@ -13,3 +13,6 @@ YZX_SMS_PARAMS = {
     'param': None,
     'mobile': None
 }
+
+# 缓存 key prefix
+VERIFY_CODE_CACHE_PREFIX = 'verfiy_code:%s'

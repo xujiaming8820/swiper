@@ -1,10 +1,11 @@
 from datetime import datetime
 
+from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import render
 
 # Create your views here.
-from common import utils, errors
+from common import utils, errors, config
 from lib.http import render_json
 from lib.sms import send
 from user import logic
@@ -17,7 +18,8 @@ def verify_phone(request):
     :param request:
     :return:
     """
-    phone_num = request.POST.get('phone_num')
+    phone_num = request.POST.get('phone_num', '')
+    phone_num = phone_num.strip()
 
     if utils.is_phone_num(phone_num.strip()):
         # 生成随机验证码
@@ -36,25 +38,19 @@ def user_login(request):
     :param request:
     :return:
     """
-    phone_num = request.POST.get('phone_num')
-    code = request.POST.get('code')
+    phone_num = request.POST.get('phone_num', '')
+    code = request.POST.get('code', '')
 
-    print(phone_num, code)
-    user = User.objects.filter(phonenum=phone_num).first()
-    if user:
-        data = {
-            'uid': user.id,
-            'nickname': user.nickname,
-            'age': datetime.now().year - user.birth_year,
-            'sex': user.sex,
-            'location': user.location,
-            'avatars': user.avatar
-        }
-        print(data)
-        return render_json({'code': 200, 'data': data})
-    else:
-        print(2222)
-    # user = User.objects.filter(phone_num=phone_num)
-    # print(user)
+    phone_num = phone_num.strip()
+    code = code.strip()
 
-    return JsonResponse({'code': 200})
+    # 1.检查验证码
+    cached_code = cache.get(config.VERIFY_CODE_CACHE_PREFIX % phone_num)
+    if cached_code != code:
+        return render_json(code=errors.VERIFY_CODE_ERR)
+
+    # 2.登录或注册
+    user, created = User.objects.get_or_create(phonenum=phone_num)
+    request.session['uid'] = user.id
+
+    return render_json(data=user.to_dict())
