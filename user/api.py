@@ -31,6 +31,11 @@ def verify_phone(request):
 
 
 def user_login(request):
+    """
+    用户登录
+    :param request:
+    :return:
+    """
     phone_num = request.POST.get('phone_num')
     code = request.POST.get('code')
 
