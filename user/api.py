@@ -1,3 +1,5 @@
+import os
+import time
 from datetime import datetime
 
 from django.core.cache import cache
@@ -8,6 +10,7 @@ from django.shortcuts import render
 from common import utils, errors, config
 from libs.http import render_json
 from libs.sms import send
+from swiper import settings
 from user import logic
 from user.forms import ProfileForm
 from user.models import User, Profile
@@ -58,24 +61,44 @@ def user_login(request):
 
 
 def get_profile(request):
+    """
+    获取查找信息
+    :param request:
+    :return:
+    """
     profile = request.user.profile
     return render_json(data=profile.to_dict(exclude=['vibration', 'only_matche', 'auto_play']))
 
 
 def set_profile(request):
+    """
+    更新查找信息
+    :param request:
+    :return:
+    """
     user = request.user
 
-    form = ProfileForm(request.POST)
-    if form.is_valid():
-        profile = form.save(commit=False)
-        # 手动创建一对一关系
-        profile.id = user.id
-        profile.save()
+    form = ProfileForm(request.POST, instance=user.profile)
 
+    if form.is_valid():
+        form.save()
         return render_json()
     else:
         return render_json(data=form.errors)
 
 
 def upload_avatar(request):
-    pass
+    avatar = request.FILES.get('avatar')
+    user = request.user
+
+    filename = 'avatar-%s-%d' % (user.id, int(time.time()))
+    filepath = os.path.join(settings.MEDIA_ROOT, filename)
+
+    with open(filepath, 'wb+') as output:
+        for chunk in avatar.chunks():
+            output.write(chunk)
+
+    user.avatar = filename
+    user.save()
+
+    return render_json()
