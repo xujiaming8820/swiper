@@ -24,4 +24,4 @@ def render_json(code=errors.OK, data=None):
     else:
         json_dumps_params = {'separators': (',', ':')}
 
-    return JsonResponse(result, json_dumps_params=json_dumps_params)
+    return JsonResponse(result, safe=False, json_dumps_params=json_dumps_params)

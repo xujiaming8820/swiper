@@ -13,3 +13,4 @@ AVATAR_UPLOAD_ERR = 1005  # AVATAR 上传失败
 
 
 # 社交系统
+LIKE_ERR = 2001  # 喜欢失败
