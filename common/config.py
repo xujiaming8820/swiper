@@ -16,3 +16,9 @@ YZX_SMS_PARAMS = {
 
 # 缓存 key prefix
 VERIFY_CODE_CACHE_PREFIX = 'verfiy_code:%s'
+
+# 七牛云配置
+QN_ACCESS_KEY = 'wsi-f-ZsS_Nbj4xfCHPGXB3K0_NqllAsXlkkkbdJ'
+QN_SECRET_KEY = 'N3sr80gxxXF9Ed35t8CxFrOeFriSYE87iiz6lFug'
+QN_BUCKET = 'swiper'
+QN_HOST = 'http://pu420clqe.bkt.clouddn.com'

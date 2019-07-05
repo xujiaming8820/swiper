@@ -91,14 +91,16 @@ def upload_avatar(request):
     avatar = request.FILES.get('avatar')
     user = request.user
 
-    filename = 'avatar-%s-%d' % (user.id, int(time.time()))
-    filepath = os.path.join(settings.MEDIA_ROOT, filename)
+    # filename = 'avatar-%s-%d' % (user.id, int(time.time()))
+    # filepath = os.path.join(settings.MEDIA_ROOT, filename)
+    #
+    # with open(filepath, 'wb+') as output:
+    #     for chunk in avatar.chunks():
+    #         output.write(chunk)
 
-    with open(filepath, 'wb+') as output:
-        for chunk in avatar.chunks():
-            output.write(chunk)
+    ret = logic.async_upload_avatar(user, avatar)
 
-    user.avatar = filename
-    user.save()
-
-    return render_json()
+    if ret:
+        return render_json()
+    else:
+        return render_json(code=errors.AVATAR_UPLOAD_ERR)
