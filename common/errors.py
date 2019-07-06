@@ -38,5 +38,6 @@ LoginRequiredError = gen_logic_error('LoginRequiredError', 1004)  # 未登录
 AvatarUploadError = gen_logic_error('AvatarUploadError', 1005)  # 上传形象失败
 
 # 社交系统
-SwipeError = gen_logic_error('SwipeError', SWIPE_ERR)
-SidError = gen_logic_error('SidError', SID_ERR)
+SwipeError = gen_logic_error('SwipeError', SWIPE_ERR)  # 滑动动作错误
+SidError = gen_logic_error('SidError', SID_ERR)  # 被滑动者不存在
+RewindLimitError = gen_logic_error('RewindLimitError', 2003)  # 返回次数超过每日上限

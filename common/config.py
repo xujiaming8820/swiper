@@ -16,6 +16,10 @@ YZX_SMS_PARAMS = {
 
 # 缓存 key prefix
 VERIFY_CODE_CACHE_PREFIX = 'verfiy_code:%s'
+REWIND_CACHE_PREFIX = 'rewind:%s'
+
+# 社交模块
+REWIND_TIMES = 3
 
 # 七牛云配置
 QN_ACCESS_KEY = 'wsi-f-ZsS_Nbj4xfCHPGXB3K0_NqllAsXlkkkbdJ'
