@@ -1,6 +1,7 @@
 import datetime
 
-from social.models import Swiped
+from common import errors
+from social.models import Swiped, Friend
 from user.models import User
 
 
@@ -33,11 +34,36 @@ def like_someone(uid, sid):
     :return:
     """
     if not User.objects.filter(id=sid).exists():
-        return False
+        raise errors.SidError
 
-    Swiped.objects.create(uid=uid, sid=sid, mark='like')
+    # 创建滑动记录
+    ret = Swiped.swipe(uid=uid, sid=sid, mark='like')
 
-    if Swiped.is_liked(sid, uid):
-        print('++ friend ++')
+    # 只有滑动成功，才可以进行好友匹配操作
+    # 如果被滑动人喜欢过我，则建立好友关系
+    if ret and Swiped.is_liked(sid, uid):
+        # Friend.make_friends(uid, sid)
+        Friend.objects.make_friends(uid, sid)
 
-    return True
+    return ret
+
+
+def superlike_someone(uid, sid):
+    """
+    创建超级喜欢的人，如果对方也喜欢，则建立好友关系
+    :param uid:
+    :param sid:
+    :return:
+    """
+    if not User.objects.filter(id=sid).exists():
+        raise errors.SidError
+
+    # 创建滑动记录
+    ret = Swiped.swipe(uid=uid, sid=sid, mark='supderlike')
+
+    # 只有滑动成功，才可以进行好友匹配操作
+    # 如果被滑动人喜欢过我，则建立好友关系
+    if ret and Swiped.is_liked(sid, uid):
+        Friend.make_friends(uid, sid)
+
+    return ret
