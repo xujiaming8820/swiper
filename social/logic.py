@@ -8,6 +8,12 @@ from user.models import User
 
 
 def recommend_users(user):
+    """
+    筛选符合 user.profile 条件的用户
+    过滤掉已经被划过的用户
+    :param user:
+    :return:
+    """
     today = datetime.date.today()
 
     # 1999 = 2019 - 20
@@ -92,6 +98,7 @@ def rewind(user):
         Friend.cancel_friends(user.id, swipe.sid)
 
     swipe.delete()
+
     now = datetime.datetime.now()
     timeout = 86400 - now.hour * 3600 - now.minute * 60 - now.second
 
@@ -105,10 +112,10 @@ def liked_me(user):
     :return:
     """
 
-    swipe_list = Swiped.objects.filter(sid=user.id,mark__in=['like', 'superlike'])
+    friend_uid_list = Friend.friend_list(user.id)
 
-    # 过滤掉已经加为好友的用户
-    # TODO: 获取好友列表
+    swipe_list = Swiped.objects.filter(sid=user.id, mark__in=['like', 'superlike']).\
+        exclude(uid__in=friend_uid_list)
 
     liked_me_uid_list = [s.uid for s in swipe_list]
 

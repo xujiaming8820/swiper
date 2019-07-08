@@ -7,6 +7,7 @@ import random
 import django
 
 # 设置环境
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "swiper.settings")
@@ -14,7 +15,7 @@ django.setup()
 
 
 from user.models import User
-# from vip.models import Vip, Permission, VipPermRelation
+from vip.models import Vip, Permission, VipPermission
 
 
 last_names = (
@@ -78,7 +79,7 @@ def init_permission():
         ('rewind',        '反悔功能'),
         ('anylocation',   '任意更改定位'),
         ('unlimit_like',  '无限喜欢次数'),
-        ('show_liked_me', '查看喜欢过我的人'),
+        ('liked_me', '查看喜欢过我的人'),
     )
 
     for name, desc in permissions:
@@ -110,28 +111,28 @@ def create_vip_perm_relations():
     rewind = Permission.objects.get(name='rewind')
     anylocation = Permission.objects.get(name='anylocation')
     unlimit_like = Permission.objects.get(name='unlimit_like')
-    show_liked_me = Permission.objects.get(name='show_liked_me')
+    liked_me = Permission.objects.get(name='liked_me')
 
     # 给 VIP 1 分配权限
-    VipPermRelation.objects.get_or_create(vip_id=vip1.id, perm_id=vipflag.id)
-    VipPermRelation.objects.get_or_create(vip_id=vip1.id, perm_id=superlike.id)
+    VipPermission.objects.get_or_create(vip_id=vip1.id, perm_id=vipflag.id)
+    VipPermission.objects.get_or_create(vip_id=vip1.id, perm_id=superlike.id)
 
     # 给 VIP 2 分配权限
-    VipPermRelation.objects.get_or_create(vip_id=vip2.id, perm_id=vipflag.id)
-    VipPermRelation.objects.get_or_create(vip_id=vip2.id, perm_id=superlike.id)
-    VipPermRelation.objects.get_or_create(vip_id=vip2.id, perm_id=rewind.id)
+    VipPermission.objects.get_or_create(vip_id=vip2.id, perm_id=vipflag.id)
+    VipPermission.objects.get_or_create(vip_id=vip2.id, perm_id=superlike.id)
+    VipPermission.objects.get_or_create(vip_id=vip2.id, perm_id=rewind.id)
 
     # 给 VIP 3 分配权限
-    VipPermRelation.objects.get_or_create(vip_id=vip3.id, perm_id=vipflag.id)
-    VipPermRelation.objects.get_or_create(vip_id=vip3.id, perm_id=superlike.id)
-    VipPermRelation.objects.get_or_create(vip_id=vip3.id, perm_id=rewind.id)
-    VipPermRelation.objects.get_or_create(vip_id=vip3.id, perm_id=anylocation.id)
-    VipPermRelation.objects.get_or_create(vip_id=vip3.id, perm_id=unlimit_like.id)
-    VipPermRelation.objects.get_or_create(vip_id=vip3.id, perm_id=show_liked_me.id)
+    VipPermission.objects.get_or_create(vip_id=vip3.id, perm_id=vipflag.id)
+    VipPermission.objects.get_or_create(vip_id=vip3.id, perm_id=superlike.id)
+    VipPermission.objects.get_or_create(vip_id=vip3.id, perm_id=rewind.id)
+    VipPermission.objects.get_or_create(vip_id=vip3.id, perm_id=anylocation.id)
+    VipPermission.objects.get_or_create(vip_id=vip3.id, perm_id=unlimit_like.id)
+    VipPermission.objects.get_or_create(vip_id=vip3.id, perm_id=liked_me.id)
 
 
 if __name__ == '__main__':
-    create_robots(2000)
-    # init_permission()
-    # init_vip()
-    # create_vip_perm_relations()
+    # create_robots(2000)
+    init_permission()
+    init_vip()
+    create_vip_perm_relations()
