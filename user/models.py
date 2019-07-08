@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.functional import cached_property
 
 from libs.orm import ModelToDictMixin
+from vip.models import Vip
 
 
 class User(models.Model):
@@ -44,6 +45,8 @@ class User(models.Model):
     avatar = models.CharField(max_length=256)
     location = models.CharField(max_length=64, choices=LOCATIONS)
 
+    vip_id = models.IntegerField(default=1)
+
     # @property
     @cached_property
     def age(self):
@@ -58,6 +61,18 @@ class User(models.Model):
             self._profile, _ = Profile.objects.get_or_create(pk=self.id)
 
         return self._profile
+
+    @property
+    def vip(self):
+        """
+        用户 vip 信息
+        :return:
+        """
+        if not hasattr(self, '_vip'):
+            self._vip = Vip.objects.get(id=self.vip_id)
+
+        return self._vip
+
 
     def to_dict(self):
         return {

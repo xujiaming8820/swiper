@@ -41,3 +41,6 @@ AvatarUploadError = gen_logic_error('AvatarUploadError', 1005)  # 上传形象�
 SwipeError = gen_logic_error('SwipeError', SWIPE_ERR)  # 滑动动作错误
 SidError = gen_logic_error('SidError', SID_ERR)  # 被滑动者不存在
 RewindLimitError = gen_logic_error('RewindLimitError', 2003)  # 返回次数超过每日上限
+
+# vip 系统
+VipPermError = gen_logic_error('VipPermError', 3001)  # 权限错误
