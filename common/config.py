@@ -1,6 +1,11 @@
 """
 业务模块配置
 """
+# 缓存 key prefix
+VERIFY_CODE_CACHE_PREFIX = 'verfiy_code:%s'
+REWIND_CACHE_PREFIX = 'rewind:%s'
+PROFILE_DATA_CACHE_PREFIX = 'profile_data:%s'
+
 
 # 云之讯短信平台配置
 YZX_SMS_URL = 'https://open.ucpaas.com/ol/sms/sendsms'
@@ -14,9 +19,7 @@ YZX_SMS_PARAMS = {
     'mobile': None
 }
 
-# 缓存 key prefix
-VERIFY_CODE_CACHE_PREFIX = 'verfiy_code:%s'
-REWIND_CACHE_PREFIX = 'rewind:%s'
+
 
 # 社交模块
 REWIND_TIMES = 3

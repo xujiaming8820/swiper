@@ -2,6 +2,7 @@ import os
 import time
 from datetime import datetime
 
+from celery.beat import logger
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -66,8 +67,25 @@ def get_profile(request):
     :param request:
     :return:
     """
-    profile = request.user.profile
-    return render_json(data=profile.to_dict(exclude=['vibration', 'only_matche', 'auto_play']))
+    user = request.user
+
+    # 1、先从缓存中获取 profile_data
+    key = config.PROFILE_DATA_CACHE_PREFIX % user.id
+    profile_data = cache.get(key)
+    logger.debug('get from cache')
+    print('get from cache')
+
+    # 2、如果缓存中没有，则从数据库获取
+    if profile_data is None:
+        profile = user.profile
+        profile_data = profile.to_dict(exclude=['vibration', 'only_matche', 'auto_play'])
+        logger.debug('get from DB')
+
+        # 3、将 profile_data 存储至缓存
+        cache.set(key, profile_data)
+        logger.debug('set cache')
+
+    return render_json(data=profile_data)
 
 
 def set_profile(request):
@@ -81,7 +99,14 @@ def set_profile(request):
     form = ProfileForm(request.POST, instance=user.profile)
 
     if form.is_valid():
-        form.save()
+        profile = form.save()
+
+        # 保存成功后，直接更新缓存
+        # 也可以通过直接删除缓存的方式更新缓存内容
+        key = config.PROFILE_DATA_CACHE_PREFIX % user.id
+        profile_data = profile.to_dict(exclude=['vibration', 'only_matche', 'auto_play'])
+        cache.set(key, profile_data)
+
         return render_json()
     else:
         return render_json(data=form.errors)
