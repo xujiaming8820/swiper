@@ -5,6 +5,8 @@
 VERIFY_CODE_CACHE_PREFIX = 'verfiy_code:%s'
 REWIND_CACHE_PREFIX = 'rewind:%s'
 PROFILE_DATA_CACHE_PREFIX = 'profile_data:%s'
+MODEL_CACHE_PREFIX = 'model:%s:%s'
+HOT_RANK_KEY = 'hot_rank'
 
 
 # 云之讯短信平台配置
@@ -23,6 +25,12 @@ YZX_SMS_PARAMS = {
 
 # 社交模块
 REWIND_TIMES = 3
+
+SWIPE_SCORES = {
+    'like': 5,
+    'superlike': 8,
+    'dislike': 0
+}
 
 # 七牛云配置
 QN_ACCESS_KEY = 'wsi-f-ZsS_Nbj4xfCHPGXB3K0_NqllAsXlkkkbdJ'

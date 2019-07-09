@@ -1,20 +1,19 @@
+import logging
 import os
 import time
-from datetime import datetime
+from urllib.parse import urljoin
 
-from celery.beat import logger
+from django.conf import settings
 from django.core.cache import cache
 from django.http import JsonResponse
-from django.shortcuts import render
 
-# Create your views here.
 from common import utils, errors, config
 from libs.http import render_json
-from libs.sms import send
-from swiper import settings
 from user import logic
 from user.forms import ProfileForm
 from user.models import User, Profile
+
+logger = logging.getLogger('inf')
 
 
 def verify_phone(request):
@@ -26,9 +25,7 @@ def verify_phone(request):
     phone_num = request.POST.get('phone_num', '')
     phone_num = phone_num.strip()
 
-    if utils.is_phone_num(phone_num.strip()):
-        # 生成随机验证码
-        # 发送随机验证码
+    if utils.is_phone_num(phone_num):
         if logic.send_verify_code(phone_num):
             return render_json()
         else:
@@ -37,36 +34,35 @@ def verify_phone(request):
     return render_json(code=errors.PhoneNumError.code)
 
 
-def user_login(request):
-    """
-    用户登录
-    :param request:
-    :return:
-    """
+def login(request):
     phone_num = request.POST.get('phone_num', '')
     code = request.POST.get('code', '')
 
     phone_num = phone_num.strip()
     code = code.strip()
 
-    # 1.检查验证码
+    # 1、检查 验证码
     cached_code = cache.get(config.VERIFY_CODE_CACHE_PREFIX % phone_num)
     if cached_code != code:
         return render_json(code=errors.VerifyCodeError.code)
 
-    # 2.登录或注册
-    user, created = User.objects.get_or_create(phonenum=phone_num)
+    # 2、登录或注册
+    # try:
+    #     user = User.get(phonenum=phone)
+    # except User.DoesNotExist:
+    #     user = User.objects.create(phonenum=phone)
+    #     # 创建用户的同时，使用 user.id 创建 Profile 对象，建立一对一的关联
+    #     Profile.objects.create(id=user.id)
+
+    user, created = User.get_or_create(phonenum=phone_num)
     request.session['uid'] = user.id
+
+    logger.info('user.login, uid:%s' % user.id)
 
     return render_json(data=user.to_dict())
 
 
 def get_profile(request):
-    """
-    获取查找信息
-    :param request:
-    :return:
-    """
     user = request.user
 
     # 1、先从缓存中获取 profile_data
@@ -89,11 +85,6 @@ def get_profile(request):
 
 
 def set_profile(request):
-    """
-    更新查找信息
-    :param request:
-    :return:
-    """
     user = request.user
 
     form = ProfileForm(request.POST, instance=user.profile)

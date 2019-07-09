@@ -1,14 +1,13 @@
 from django.db import models
 
-from libs.orm import ModelToDictMixin
 
-
-class Vip(models.Model, ModelToDictMixin):
+class Vip(models.Model):
     """
     会员
     """
     name = models.CharField(max_length=32, unique=True)
     level = models.IntegerField(unique=True, default=0)
+    # price decimal(5,2)
     price = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
     @property
@@ -42,7 +41,7 @@ class Vip(models.Model, ModelToDictMixin):
         db_table = 'vips'
 
 
-class Permission(models.Model, ModelToDictMixin):
+class Permission(models.Model):
     """
     权限
     """
@@ -55,7 +54,7 @@ class Permission(models.Model, ModelToDictMixin):
 
 class VipPermission(models.Model):
     """
-    关系表
+    会员-权限 关系
     """
     vip_id = models.IntegerField()
     perm_id = models.IntegerField()

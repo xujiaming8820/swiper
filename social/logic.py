@@ -3,6 +3,7 @@ import datetime
 from django.core.cache import cache
 
 from common import errors, config
+from libs import rds
 from social.models import Swiped, Friend
 from user.models import User
 
@@ -44,17 +45,22 @@ def like_someone(uid, sid):
     if not User.objects.filter(id=sid).exists():
         raise errors.SidError
 
-    # 创建滑动记录
+        # 创建滑动记录
     ret = Swiped.swipe(uid=uid, sid=sid, mark='like')
 
-    # 只有滑动成功，才可以进行好友匹配操作
-    # 如果被滑动人喜欢过我，则建立好友关系
-    if ret and Swiped.is_liked(sid, uid):
-        # Friend.make_friends(uid, sid)
-        # TODO 向 sid 用户推送通知
-        Friend.objects.make_friends(uid, sid)
+    # 只有滑动成功，才可以增加积分操作
+    if ret:
+        add_swipe_score('like', sid)
 
-    return ret
+        # 只有滑动成功，才可以进行好友匹配操作
+        # 如果被滑动人喜欢过我，则建立好友关系
+        if Swiped.is_liked(sid, uid):
+            # Friend.make_friends(uid, sid)
+            # TODO: 向 sid 用户发送推送通知
+            Friend.objects.make_friends(uid, sid)
+            return True
+
+    return False
 
 
 def superlike_someone(uid, sid):
@@ -70,11 +76,15 @@ def superlike_someone(uid, sid):
         # 创建滑动记录
     ret = Swiped.swipe(uid=uid, sid=sid, mark='superlike')
 
-    # 只有滑动成功，才可以进行好友匹配操作
-    # 如果被滑动人喜欢过我，则建立好友关系
-    if ret and Swiped.is_liked(sid, uid):
-        Friend.make_friends(uid, sid)
-        return True
+    # 只有滑动成功，才可以进行增加积分操作
+    if ret:
+        add_swipe_score('superlike', sid)
+
+        # 只有滑动成功，才可以进行好友匹配操作
+        # 如果被滑动人喜欢过我，则建立好友关系
+        if Swiped.is_liked(sid, uid):
+            Friend.make_friends(uid, sid)
+            return True
 
     return False
 
@@ -112,12 +122,47 @@ def liked_me(user):
     :param user:
     :return:
     """
-
+    # 过滤掉已经加为好友的用户
     friend_uid_list = Friend.friend_list(user.id)
 
-    swipe_list = Swiped.objects.filter(sid=user.id, mark__in=['like', 'superlike']).\
+    swipe_list = Swiped.objects. \
+        filter(sid=user.id, mark__in=['like', 'superlike']). \
         exclude(uid__in=friend_uid_list)
 
     liked_me_uid_list = [s.uid for s in swipe_list]
+    # print(liked_me_uid_list)
 
     return liked_me_uid_list
+
+
+def add_swipe_score(swipe_type, sid):
+    """
+    为滑动操作增加积分
+    :param swipe_type:
+    :param sid:
+    :return:
+    """
+    score = config.SWIPE_SCORES.get(swipe_type, 0)
+
+    rds.zincrby(config.HOT_RANK_KEY, score, sid)
+
+
+def get_top_rank(num):
+    origin_data = rds.zrevrange('hot_rank', 0, num - 1, withscores=True)
+    cleand_data = [[int(uid), int(score)] for uid, score in origin_data]
+
+    # 单个获取
+    # rank_data = [{'user': User.get(pk=uid).to_dict(), 'score': score} for uid, score in cleand_data]
+
+    # 批量获取
+    uid_list = [uid for uid, _ in cleand_data]
+    user_list = User.objects.filter(id__in=uid_list)
+
+    # 通过 sorted 进行排序，排序依据为：uid_list 的下标
+    user_list = sorted(user_list, key=lambda user: uid_list.index(user.id))
+
+    rank_data = []
+    for user, (_, score) in zip(user_list, cleand_data):
+        rank_data.append([user, score])
+
+    return rank_data

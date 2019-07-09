@@ -107,3 +107,21 @@ def friends(request):
     friend_list = [u.to_dict() for u in my_friends]
 
     return render_json(data=friend_list)
+
+
+def top10(request):
+    """
+    获取人气排行榜
+    :param request:
+    :return:
+    """
+    ret_data = logic.get_top_rank(10)
+
+    rank_data = []
+
+    for user, score in ret_data:
+        user_dict = user.to_dict()
+        user_dict['score'] = score
+        rank_data.append(user_dict)
+
+    return render_json(data=rank_data)

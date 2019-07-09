@@ -89,6 +89,13 @@ CACHES = {
         }
     }
 }
+
+REDIS = {
+    'host': 'localhost',
+    'port': 6379,
+    'db': 2
+}
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',

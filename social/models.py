@@ -1,6 +1,4 @@
 from django.db import models
-
-# Create your models here.
 from django.db.models import Q
 
 from common import errors
@@ -42,7 +40,8 @@ class Swiped(models.Model):
             raise LogicException(errors.SWIPE_ERR)
 
         if cls.objects.filter(uid=uid, sid=sid).exists():
-            return False
+            # return False
+            return True
         else:
             cls.objects.create(uid=uid, sid=sid, mark=mark)
             return True
